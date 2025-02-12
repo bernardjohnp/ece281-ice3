@@ -32,27 +32,27 @@ begin
     );
     
     test_process : process 
-    begin
-        -- Test all zeros
-        w_addends <= x"00"; w_Cin <= '0'; wait for 10 ns;
-            assert (w_sum = x"0" and w_Cout = '0') report "Failed 0+0+0" severity failure;
-        
-        -- Test max values with carry in
-        w_addends <= x"FF"; w_Cin <= '1'; wait for 10 ns;
-            assert (w_sum = x"E" and w_Cout = '1') report "Failed F+F+1" severity failure;
-        
-        -- Test carry propagation
-        w_addends <= x"11"; w_Cin <= '0'; wait for 10 ns;
-            assert (w_sum = x"2" and w_Cout = '0') report "Failed 1+1+0" severity failure;
-        
-        -- Test carry in
-        w_addends <= x"01"; w_Cin <= '1'; wait for 10 ns;
-            assert (w_sum = x"2" and w_Cout = '0') report "Failed 0+1+1" severity failure;
-        
-        -- Test overflow
-        w_addends <= x"8F"; w_Cin <= '0'; wait for 10 ns;
-            assert (w_sum = x"3" and w_Cout = '1') report "Failed 8+F+0" severity failure;
-        
-        wait;
-    end process;    
+begin
+    -- Test 0 + 0 + 0
+    w_addends <= x"00"; w_Cin <= '0'; wait for 10 ns;
+        assert (w_sum = x"0" and w_Cout = '0') report "0+0+0 failed" severity failure;
+
+    -- Test 8 + F + 0 (Overflow case)
+    w_addends <= x"8F"; w_Cin <= '0'; wait for 10 ns;
+        assert (w_sum = x"7" and w_Cout = '1') report "8+F+0 failed" severity failure;
+
+    -- Test 1 + 1 + 0 (Carry propagation)
+    w_addends <= x"11"; w_Cin <= '0'; wait for 10 ns;
+        assert (w_sum = x"2" and w_Cout = '0') report "1+1+0 failed" severity failure;
+
+    -- Test 0 + 1 + 1 (Carry-in)
+    w_addends <= x"01"; w_Cin <= '1'; wait for 10 ns;
+        assert (w_sum = x"2" and w_Cout = '0') report "0+1+1 failed" severity failure;
+
+    -- Test F + F + 1 (Max values + carry)
+    w_addends <= x"FF"; w_Cin <= '1'; wait for 10 ns;
+        assert (w_sum = x"F" and w_Cout = '1') report "F+F+1 failed" severity failure;
+
+    wait;
+    end process;  
 end test_bench;
